@@ -32,13 +32,14 @@ void enQueue(Vertex* a_vertex);
 
 
 int initializeGraph(headVertex** h);//헤드 vertex의 list를 동적할당
-
+int freeGraph(headVertex* h);//동적할당 해제. 배열인 헤드와 배열 안에 들어있는 리스트들 모두 해제해주어야 한다.
 
 
 int main()
 {
 	char command;
 	int key;
+	//headvertex에는 크기 10의 배열의 시작 주소가 들어있음.
 	//headvertex[0]->a_vertex에는 0번째 vertex의 주소를 저장.
 	headVertex* headvertex = NULL;
 
@@ -93,6 +94,7 @@ int main()
 }
 
 
+/*정상 작동 확인하기*/
 int initializeGraph(headVertex** h){
 	if(*h != NULL){//이미 할당받은 상태면 일단 다 free해주고
 		free(*h);
@@ -105,4 +107,24 @@ int initializeGraph(headVertex** h){
 	}
 
 	return 1;
+}
+
+/*정상 작동 확인하기*/
+int freeGraph(headVertex* h){
+	headVertex* head = h;
+	Vertex* temp = NULL;
+	Vertex* p = NULL;
+
+// 배열의 주소 p에 상수를 더하면 [a]와 같은 효과
+	for(int a=0; head+a != NULL; a++){
+		p = head[a].a_vertex;//헤드에 저장되어 있는 정점의 주소를 저장한다.(동적할당 되어있음)
+		while(p != NULL){
+			temp = p;//해제할 노드 저장
+			p = p->link;//다음 노드 이동
+			free(temp);
+		}
+	}
+	//마지막에 동적할당한 배열 해제
+	free(h);
+	return 0;
 }
