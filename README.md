@@ -2,11 +2,11 @@
 graph-search
 
 # To build
--[] Initialize Graph
--[] Insert Vertex
--[] Depth First Search
--[] Print Graph
+-[O] int Initialize Graph
+-[O] int freeGraph (?)
+-[O] int Insert Vertex
 -[] Insert Edge
+-[] Print Graph
+-[] Depth First Search
 -[] Breath First Search
--[] freeGraph (?)
 -[] main 
