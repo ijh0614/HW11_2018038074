@@ -5,8 +5,8 @@ graph-search
 -[O] int Initialize Graph
 -[O] int freeGraph (?)
 -[O] int Insert Vertex
--[] void Insert Edge
--[] Print Graph
+-[O] void Insert Edge
+-[O] Print Graph
 -[] Depth First Search
 -[] Breath First Search
 -[] main 

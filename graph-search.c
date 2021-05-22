@@ -59,7 +59,7 @@ int main()
 		printf(" Initialize Graph      = z                                       \n");
 		printf(" Insert Vertex         = v      Insert Edge                  = e \n");
 		printf(" Depth First Search    = d      Breath First Search          = b \n");
-		printf(" Print Graph           = P      Quit                         = q \n");
+		printf(" Print Graph           = p      Quit                         = q \n");
 		printf("----------------------------------------------------------------\n");
 
 		printf("Command = ");
@@ -154,7 +154,7 @@ int insertVertex(headerVertex* h){
 	int num = 0;
 	
 	for(num=0; num<MAX_VERTEX_SIZE; num++){//몇번째 정점인지 알아야 한다.
-		if(h+num == NULL){//해당 배열에 아무것도 저장되어있지 않으면
+		if((h+num)->a_vertex == NULL){//해당 배열에 아무것도 저장되어있지 않으면
 			Vertex* node = (Vertex*)malloc(sizeof(Vertex));//vertex(정점) 동적할당
 			node->key = num;//vertex는 키 값을 따로 입력받지 않고, 순서대로 명명
 			node->link = NULL;
@@ -199,7 +199,7 @@ void printGraph(headerVertex* h){
 	Vertex* node = NULL;
 	int a=0;
 
-	while((h+a)->a_vertex == NULL){//vertex head 의 배열을 바깥쪽 반복문으로
+	while((h+a)->a_vertex != NULL && a<MAX_VERTEX_SIZE){//vertex head 의 배열을 바깥쪽 반복문으로
 		printf("Vertex [%d] : ", a);// 정점 출력
 		node = (h+a)->a_vertex->link;//해당 정점의 다음 주소를 저장
 
@@ -213,9 +213,11 @@ void printGraph(headerVertex* h){
 }
 
 void depthFirstSearch(){
+
 	return ;
 }
 
 void breathFirstSearch(){
+	
 	return ;
 }
