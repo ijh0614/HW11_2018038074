@@ -26,6 +26,8 @@ Vertex* queue[MAX_QUEUE_SIZE];
 int front = 0;
 int rear = 0;
 
+int visited[MAX_VERTEX_SIZE] = {0,};//배열 모드 0으로 초기화. 0이면 방문 안 했고 1이면 방문함
+
 Vertex* deQueue();
 void enQueue(Vertex* a_vertex);
 
@@ -36,9 +38,14 @@ int freeGraph(headerVertex* h);//동적할당 해제. 배열인 헤드와 배열
 int insertVertex(headerVertex* h);
 void insertEdge(headerVertex* h, int edge_first, int edge_second);
 Vertex* find_header(headerVertex* h,int num);
-void insert_tail(Vertex* vertex, int _key);
+int insert_tail(Vertex* vertex, int _key);
 void printGraph(headerVertex* h);
-void depthFirstSearch();
+void depthFirstSearch(headerVertex* h, int start_vertex);
+Vertex* stack_top();//스택의 현재 top에 저장된 정점의 주소를 반환
+int adjacent(Vertex* a_vertex);/*인자로 전달받은 정점과 edge로 연결된 정점 확인. 연결리스트를 진행하면서 visited 배열에 저장된 값이 0이면 해당 key 반환.
+반환받은 정수를 가지고 정점을 찾아서 stack에 넣기.
+(단, key값인 숫자로 비교해야 함! 삽입한 vertex[a]와 vertex[b]에 인접리스트 [a]의 주소는 다름 )*/
+
 void breathFirstSearch();
 
 int main()
@@ -47,6 +54,7 @@ int main()
 	int key;
 	int edge_first;
 	int edge_second;
+	int start_vertex;
 	//headvertex에는 크기 10의 배열의 시작 주소가 들어있음.
 	//headvertex[0]->a_vertex에는 0번째 vertex의 주소를 저장.
 	headerVertex* headvertex = NULL;
@@ -80,6 +88,10 @@ int main()
 			scanf("%d", &edge_first);
 			printf("Please input second vertex in edge. : ");
 			scanf("%d", &edge_second);
+			if(edge_first==edge_second){
+				printf("You can't make self edge. \n");
+				break;
+			}
 			if(edge_first >=MAX_VERTEX_SIZE || edge_second >= MAX_VERTEX_SIZE){//최대  vertex수보다 큰 값을 넣으면 예외 전처리
 				printf("\nInput value exceed max vertex size. Please try agian\n");
 				break;
@@ -90,7 +102,9 @@ int main()
 			printGraph(headvertex);
 			break;
 		case 'd': case 'D':
-            depthFirstSearch();
+			printf("Please input start vertex : ");
+			scanf("%d", &start_vertex);
+            depthFirstSearch(headvertex, start_vertex);
 			break;
 		case 'b': case 'B':
             breathFirstSearch();
@@ -108,7 +122,7 @@ int main()
 }
 
 
-/*정상 작동 확인하기*/
+
 int initializeGraph(headerVertex** h){
 	if(*h != NULL){//이미 할당받은 상태면 일단 다 free해주고
 		free(*h);
@@ -123,7 +137,7 @@ int initializeGraph(headerVertex** h){
 	return 1;
 }
 
-/*정상 작동 확인하기*/
+
 int freeGraph(headerVertex* h){
 	headerVertex* head = h;
 	Vertex* temp = NULL;
@@ -185,14 +199,22 @@ Vertex* find_header(headerVertex* h, int num){//리스트의 첫번째, 즉 정�
 	return (h+num)->a_vertex;
 }
 
-void insert_tail(Vertex* vertex, int _key){//인자로 끝에 추가해줄 vertex와, 추가할 vertex의 번호를 준다.
+int insert_tail(Vertex* vertex, int _key){//인자로 끝에 추가해줄 vertex와, 추가할 vertex의 번호를 준다.
+	//여기서 vertex는 헤드 vertex배열에 저장된 vertex노드
 	Vertex* node = (Vertex*)malloc(sizeof(Vertex));
 	node->key = _key;//값 할당
 	node->link = NULL;//주소 NULL 할당
+
 	while(vertex->link != NULL){//vertex의 끝으로 이동
+
+		if(vertex->link->key == _key){//edge 중복 입력시 예외처리!
+			printf("Edge already exist!\n");
+			return 0;
+		}
 		vertex = vertex->link;
 	}
 	vertex->link = node;//vertex의 끝에 추가
+	return 1;
 }
 
 void printGraph(headerVertex* h){
@@ -212,9 +234,70 @@ void printGraph(headerVertex* h){
 	}
 }
 
-void depthFirstSearch(){
+void depthFirstSearch(headerVertex* h, int start_vertex){//preorder과 유사한 방식의 출력
+	
+	int a=0;
+	int b=0;
+	Vertex* node = (h+start_vertex)->a_vertex;//헤드에 들어있는 첫번째 vertex주소
+	Vertex* pop_node= node;
+	for(a=0;a<MAX_VERTEX_SIZE;a++){//visit flag 초기화
+		visited[a] = 0;
+	}
+
+	if(node == NULL){//정점이 없는 곳에서부터 DFS를 실행하려고 할 때
+		printf("There is no vertex.\n");
+		return;
+	}
+
+	printf("DFS : [%d] ", node->key);
+	push(node);//먼저 인자로 받은 첫번째 정점은 삽입
+
+	while(pop_node != NULL){
+		b = adjacent(stack_top());//다음에 입력받을 정점의 key를 대입
+
+		if(b==-999){//반환할 연결된 정점이 없었을 경우
+			pop_node = pop();
+		}
+		else{
+			printf("[%d] ", b);
+			push((h+b)->a_vertex);//푸쉬와 동시에 visit flag
+		}
+	}
 
 	return ;
+}
+
+Vertex* stack_top(){
+	if(top==-1){
+		return NULL;
+	}
+	return stack[top];
+}
+
+int adjacent(Vertex* a_vertex){
+	if(a_vertex==NULL){
+		return -999;
+	}
+	while(a_vertex != NULL){
+		//printf("<%d>\n",a_vertex->key);
+		if(visited[a_vertex->key] == 0){//정점과 연결된 정점이 방문한적이 없으면
+			return a_vertex->key;//해당 정점의 key를 반환
+		}
+		a_vertex = a_vertex->link;//다음 정점으로 이동
+	}
+	return -999;//반복문을 다 돌았는데 없으면
+}
+Vertex* pop(){
+	if(top == -1){//더 이상 스택에 저장되어있는 값으 없는 경우
+		return NULL;//NULL을 반환한다
+	}
+
+	//그렇지 않으면
+	return stack[top--];//맨 위에 스택 값을 반환하고 top을 하나 줄여준다.
+}
+void push(Vertex* a_vertex){
+	stack[++top] = a_vertex;//top을 먼저 증가시키고 스택에 삽입
+	visited[a_vertex->key] = 1;//스택에 넣으면 해당 숫자 방문 체크
 }
 
 void breathFirstSearch(){

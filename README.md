@@ -7,6 +7,6 @@ graph-search
 -[O] int Insert Vertex
 -[O] void Insert Edge
 -[O] Print Graph
--[] Depth First Search
+-[O] Depth First Search
 -[] Breath First Search
 -[] main 
