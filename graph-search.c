@@ -46,7 +46,7 @@ int adjacent(Vertex* a_vertex);/*인자로 전달받은 정점과 edge로 연결
 반환받은 정수를 가지고 정점을 찾아서 stack에 넣기.
 (단, key값인 숫자로 비교해야 함! 삽입한 vertex[a]와 vertex[b]에 인접리스트 [a]의 주소는 다름 )*/
 
-void breathFirstSearch();
+void breathFirstSearch(headerVertex* h, int start_vertex);
 
 int main()
 {
@@ -107,7 +107,9 @@ int main()
             depthFirstSearch(headvertex, start_vertex);
 			break;
 		case 'b': case 'B':
-            breathFirstSearch();
+			printf("Please input start vertex : ");
+			scanf("%d", &start_vertex);
+            breathFirstSearch(headvertex, start_vertex);
 			break;
 
 
@@ -300,7 +302,58 @@ void push(Vertex* a_vertex){
 	visited[a_vertex->key] = 1;//스택에 넣으면 해당 숫자 방문 체크
 }
 
-void breathFirstSearch(){
+void breathFirstSearch(headerVertex* h, int start_vertex){
 	
+	int a=0;
+	int b=0;
+	Vertex* node = (h+start_vertex)->a_vertex;//헤드에 들어있는 첫번째 vertex주소
+	Vertex* de_node = node;
+	Vertex* temp = de_node;
+
+	if(node == NULL){//정점이 없는 곳에서부터 BFS를 실행하려고 할 때
+		printf("There is no vertex.\n");
+		return;
+	}
+
+	for(a=0;a<MAX_VERTEX_SIZE;a++){//visit flag 초기화
+		visited[a] = 0;
+	}
+	front = 0;
+	rear = 0;//큐의 포인터들 초기화
+
+	enQueue(node);//enqueue에서 visited 1로
+	printf("BFS : [%d] ", node->key);
+
+	while(de_node != NULL){
+		de_node = deQueue();//큐에서 하나 꺼내고
+		if(de_node == NULL){
+			break;
+		}
+		temp = de_node->link;
+
+		while(temp != NULL){//다음 계층 조사
+			if(visited[temp->key]==0){//아직 방문하지 않은게 있으면
+				enQueue((h+(temp->key))->a_vertex);//큐에 추가
+				printf(" [%d] ", temp->key);
+			}
+			temp = temp->link;
+		}
+	}
+
+
 	return ;
+}
+
+
+Vertex* deQueue(){
+	//front가 가르치는 위치와 rear가 가르치는 위치가 같은 경우. 즉 큐가 비어있는 경우
+	if(front == rear){
+		return NULL;//널 반환
+	}
+
+	return queue[front++];
+}
+void enQueue(Vertex* a_vertex){
+	visited[a_vertex->key] = 1;
+	queue[rear++] = a_vertex;
 }
